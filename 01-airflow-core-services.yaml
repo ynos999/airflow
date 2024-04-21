@@ -12,10 +12,11 @@ services:
     # deploy:
     #   placement:
     #     constraints:
-    #       - node.hostname == <target_node_name>
-    #       vai:
+    #       - node.hostname == target_node_name
+
+    # Uzzināt master node name `docker node ls`, lai dockeris nemaina lokāciju.
     #       - "node.role==manager" 
-    # Atradīsies tikai uz master node...
+    # Atradīsies tikai uz manager node. Ja vairāki manager, tad nederēs.
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
@@ -30,7 +31,7 @@ services:
     # deploy:
     #   placement:
     #     constraints:
-    #       - node.hostname == <target_node_name>
+    #       - node.hostname == target_node_name
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -48,8 +49,7 @@ services:
     # deploy:
     #   placement:
     #     constraints:
-    #       - node.hostname == <target_node_name>
-    # Uzzināt master node name, lai var docker nemaina lokāciju... Komanda: docker node ls
+    #       - node.hostname == target_node_name
     ports:
       - 5000:5000
     volumes:
