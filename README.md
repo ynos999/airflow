@@ -173,3 +173,47 @@ sudo docker service ps airflow-stack_airflow-triggerer --no-trunc
 ```
 docker service rm airflow-core_airflow-scheduler airflow-core_airflow-triggerer airflow-core_airflow-webserver airflow-core_airflow-worker
 ```
+## Uzlikt Doker dashboard: https://portainer.io
+```
+curl -L https://downloads.portainer.io/ce2-19/portainer-agent-stack.yml -o portainer-agent-stack.yml
+```
+```
+docker stack deploy -c portainer-agent-stack.yml portainer
+```
+
+
+## Secrets piemērs:
+```
+version: "3.5"
+
+services:
+  mysql:
+    image:mysql:8
+    environment:
+      MYSQL_DATABASE: testb
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+    secrets:
+      - mysql_root_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - "node.role==manager" # Atradīsies tikai uz master node...
+
+secrets:
+  mysql_root_password:
+    extrenal: true
+
+volumes:
+  mysql_data:
+
+```
+## Docker secret create:
+```
+printf "MyPAssword123" | docker secret create mysql_root_password -
+```
+```
+cat /run/secrets/mysql_root_password
+```

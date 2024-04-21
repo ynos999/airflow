@@ -13,6 +13,9 @@ services:
     #   placement:
     #     constraints:
     #       - node.hostname == <target_node_name>
+    #       vai:
+    #       - "node.role==manager" 
+    # Atradīsies tikai uz master node...
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
