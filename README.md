@@ -173,6 +173,10 @@ sudo docker service ps airflow-stack_airflow-triggerer --no-trunc
 ```
 docker service rm airflow-core_airflow-scheduler airflow-core_airflow-triggerer airflow-core_airflow-webserver airflow-core_airflow-worker
 ```
+## Docker info:
+```
+docker info
+```
 ## Uzlikt Doker dashboard: https://portainer.io
 ```
 curl -L https://downloads.portainer.io/ce2-19/portainer-agent-stack.yml -o portainer-agent-stack.yml
@@ -180,40 +184,58 @@ curl -L https://downloads.portainer.io/ce2-19/portainer-agent-stack.yml -o porta
 ```
 docker stack deploy -c portainer-agent-stack.yml portainer
 ```
-
-
-## Secrets piemērs:
-```
-version: "3.5"
-
-services:
-  mysql:
-    image:mysql:8
-    environment:
-      MYSQL_DATABASE: testb
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-    secrets:
-      - mysql_root_password
-    volumes:
-      - mysql_data:/var/lib/mysql
-    deploy:
-      replicas: 2
-      placement:
-        constraints:
-          - "node.role==manager" # Atradīsies tikai uz master node...
-
-secrets:
-  mysql_root_password:
-    extrenal: true
-
-volumes:
-  mysql_data:
-
-```
 ## Docker secret create:
 ```
-printf "MyPAssword123" | docker secret create mysql_root_password -
+echo "mysecretuser" | docker secret create postgres_user -
+echo "mysecretpassword" | docker secret create postgres_passwd -
 ```
+## Secret piemērs docker swarm postgres:
 ```
-cat /run/secrets/mysql_root_password
+version: '3.8'
+
+services:
+ db:
+    image: postgres:13
+    secrets:
+      - postgres_user
+      - postgres_passwd
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_passwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+secrets:
+ postgres_user:
+    external: true
+ postgres_passwd:
+    external: true
+
+volumes:
+ postgres_data:
+```
+## Docker secret atrašanās vieta:
+```
+cat /run/secrets/postgres_user
+cat /run/secrets/postgres_passwd
+```
+## Apskatīties Docker secret:
+```
+docker secret ls
+```
+## Docker secret inspect:
+```
+docker secret inspect <secret_name>
+```
+## Ielogoties datubāzē:
+```
+psql -h localhost -U mysecretuser -d postgres --password
+\dt
+```
+## Ja grib dzēst secret, tad sākumā ir jāizdzēš serviss:
+```
+docker service rm <service_name>
+docker secret remove <secret_name>
 ```
