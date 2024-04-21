@@ -46,7 +46,7 @@ services:
     #   placement:
     #     constraints:
     #       - node.hostname == <target_node_name>
-    # Uzzināt node name, lai var uzlikt postgres nemaina lokāciju... docker node ls
+    # Uzzināt master node name, lai var docker nemaina lokāciju... Komanda: docker node ls
     ports:
       - 5000:5000
     volumes:

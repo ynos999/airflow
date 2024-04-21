@@ -1,7 +1,7 @@
 ---
 x-airflow-common: &airflow-common
-  # image: registry:5000/ringolds-airflow:2.9.0-001
-  image: 127.0.0.1:5000/ringolds-airflow:2.9.0-001
+  # image: registry:5000/fid-airflow:2.9.0-001
+  image: 127.0.0.1:5000/fid-airflow:2.9.0-001
 
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -14,8 +14,10 @@ x-airflow-common: &airflow-common
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+
 #  volumes:
 #    - ./airflow/logs:/opt/airflow/logs
+
   user: "${AIRFLOW_UID:-50000}:0"
 
 version: "3.8"
@@ -26,12 +28,6 @@ services:
     command: webserver
     ports:
       - "8080:8080"
-    # deploy:
-    #   restart_policy:
-    #     condition: on-failure
-    #     delay: 5s
-    #     max_attempts: 3
-    #     window: 120s
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -45,10 +41,6 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
-    # deploy:
-    #  replicas: 2
-    #  placement:
-    #   max_replicas_per_node: 2
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s

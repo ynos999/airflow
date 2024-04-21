@@ -7,7 +7,6 @@ docker network create --driver overlay --scope swarm airflow
 ```
 
 **2. Palaiž postgres, redis un private registry**
-
 ```
 docker stack deploy -c .\01-airflow-core-services.yaml airflow-core-services
 ```
@@ -15,18 +14,38 @@ docker stack deploy -c .\01-airflow-core-services.yaml airflow-core-services
 **3. Build airflow**
 
 ```
-docker build -t ringolds-airflow:2.9.0-001 ./airflow
-docker tag ringolds-airflow:2.9.0-001 127.0.0.1:5000/ringolds-airflow:2.9.0-001
-# docker tag ringolds-airflow:2.9.0-001 registry:5000/ringolds-airflow:2.9.0-001
-
-docker push 127.0.0.1:5000/ringolds-airflow:2.9.0-001
-# docker push registry:5000/ringolds-airflow:2.9.0-001
-
-# sudo nano /etc/hosts
-# 127.0.0.1 registry
-# Ja izmanto registry, tad pievieno yaml image un hosts...
+docker build -t fid-airflow:2.9.0-001 ./airflow
 ```
 
+```
+docker tag fid-airflow:2.9.0-001 127.0.0.1:5000/fid-airflow:2.9.0-001
+```
+
+vai:
+
+```
+docker tag fid-airflow:2.9.0-001 registry:5000/fid-airflow:2.9.0-001
+```
+
+```
+docker push 127.0.0.1:5000/ringolds-airflow:2.9.0-001
+```
+vai:
+
+```
+docker push registry:5000/ringolds-airflow:2.9.0-001
+```
+
+## Ja lieto registry:5000, tad hosts failā ir jāveic izmaiņas:
+```
+sudo nano /etc/hosts
+```
+```
+127.0.0.1 registry
+```
+## Ja izmanto registry, tad pievieno 02 un 03 failā image name...
+
+```
 Kad tiks veiktas izmaiņas, tad ir atkārtoti jāveic visas operācijas un ir jānomaina
 tagi, lai nebūtu konfliktu ar citām versijām.
 
@@ -34,13 +53,13 @@ Kā arī, kad tiek nomainīts tags, tad tas ir jānomaina visos docker compose f
 kur šis tags ir izmantots.
 
 Svarīgi! Ja tiek izmantots localhost, tad privātais reģistrs nestrādās, jo būs
-problēmas ar DNS, tāpēc ir jāizmanto 127.0.0.1.
+problēmas ar DNS, tāpēc ir jāizmanto 127.0.0.1 vai jārediģē hosts fails.
 
 Pievērs uzmanību otrajai komandai, kur tiek norādīts registry:5000. Tas ir iekšējais
 reģistrs, kas ir izveidots ar stack `airflow-base-services`, bet pushots tiek uz
-127.0.0.1. Šī daļa dokumentācijā vismaz man likās ļoti neskaidra šādā scenārijā.
+127.0.0.1.
 
-Ja tu vēlētos veikt push no āras, tad ir divi veidi, kā to var izdarīt:
+Ja vēlētos veikt push no āras, tad ir divi veidi, kā to var izdarīt:
 
 1. Pieslēdzies ar ssh uz serveri, kur ir pieeja privātajam reģistram un veic push no
    turienes (visdrošāk un visvieglāk) vai
@@ -54,7 +73,11 @@ docker stack deploy -c .\02-airflow-init.yaml airflow-init
 
 ```
 
-Un tad, kad airflow-init ir pabeidzis darbu (nosaka ar `docker stack ps airflow-init`), tad ir jāizdzēš stack `airflow-init` un jāpalaiž stack `airflow-core`
+Kad airflow-init ir pabeidzis darbu (nosaka ar `docker stack ps airflow-init`), tad ir jāizdzēš stack `airflow-init` un jāpalaiž stack `airflow-core`
+
+```
+docker stack ps airflow-init
+```
 
 ```
 docker stack rm airflow-init
@@ -67,126 +90,149 @@ docker stack deploy -c .\03-airflow-core.yaml airflow-core
 
 ```
 
-## Dalītie resursi
-
-1. Postgres
-2. Redis
-3. `airflow` folderis - šis ir aikomentēts, nestrādāja...
-4. `postgres` folderis
-
 ## Noderīgas komandas:
 
-# Inicializēt docker swarm:
+## Inicializēt docker swarm:
 
 ```
 docker swarm init
 ```
 
-# Redzēt logus:
+## Redzēt stack logus:
 
 ```
 docker stack logs [folder_name]-[stack_name]-[service_name] -f
 ```
 
-# Uzzināt node name, lai var uzlikt, ka docker nemaina lokāciju...
+## Uzzināt node name, lai var uzlikt, ka docker nemaina lokāciju...
+
 ```
 docker node ls
 ```
 
-# Ielogoties kontēnerī:
+## Ielogoties kontēnerī:
 
+```
 docker exec -it <mycontainer> bash
+```
 
-
-# Izveidot tīklu:
+## Izveidot tīklu:
 
 ```
 Creating network airflow
 ```
 
-# Docker network saraksts:
+## Docker network saraksts:
+
 ```
 docker network ls
 ```
 
-# Dzēst docker network:
+## Dzēst docker network:
+
 ```
 docker network rm airflow
 ```
 
-# Docker service logs:
+## Docker service logs:
+
 ```
 docker service logs <service_name>
 ```
 
-# Docker logs:
+## Docker logs:
+
 ```
 docker logs <docker name>
 ```
 
-# Apskatīties esošos servisus:
+## Apskatīties esošos servisus:
+
 ```
 docker service ls
 ```
+## Apskatīt konkrētu servisu:
 
-# Apskatīt konkrētu servisu:
 ```
 docker service ps airflow-core-services_postgres
 ```
 
-# Visus stack servisus:
+## Visus stack servisus:
+
 ```
 docker stack services airflow-stack
 ```
 
-# Apskatīties visus dokerus:
+## Apskatīties visus dokerus:
+
 ```
 docker ps -a
 ```
 
-# Apskatīties strādājošus dokerus:
+## Apskatīties strādājošus dokerus:
+
 ```
 docker ps
 ```
 
-# Dzēst visus servisus:
+## Dzēst visus servisus:
+
 ```
 docker service rm $(docker service ls -q)
 ```
 
-# Konkrēta servisa dzēšana:
+## Konkrēta servisa dzēšana:
+
 ```
 docker service rm airflow-stack_airflow-init
 ```
 
-# Šis ir priekš docker compose:
+## Palaist docker compose fonā:
+
 ```
 docker-compose up -d --build
+```
+
+## Dzēst docker compose:
+
+```
 docker-compose down
 ```
 
-# Docker volumes:
+## Docker volumes atrašanās lokācija:
 ```
 /var/lib/docker/volumes
 ```
+## Docker volume saraksts:
+
 ```
 docker volume ls
 ```
-# Docker image saraksts:
+## Dzēst volume:
+
+```
+docker volume rm <volume name>
+```
+
+## Docker image saraksts:
+
 ```
 docker images ls
 ```
-# Dzēst docker image:
+## Dzēst docker image:
+
 ```
 docker rmi 7fc37b47acde
 ```
 
-# Ja no servisa neuztaisa docker, var paskatīties sīkāk:
+## Ja no serviss neuztaisa docker, var paskatīties sīkāk:
+
 ```
 sudo docker service ps airflow-stack_airflow-triggerer --no-trunc
 ```
 
-# Dzēst vairākus servisus:
+## Dzēst vairākus servisus:
+
 ```
 docker service rm airflow-core_airflow-scheduler airflow-core_airflow-triggerer airflow-core_airflow-webserver airflow-core_airflow-worker
 ```

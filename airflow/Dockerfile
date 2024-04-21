@@ -1,5 +1,3 @@
-# Var mēģināt aizstāt ar slim versiju.
-# To, visticamāk, būtu jādara, bet var gadīties problēmas ar instalāciju
 FROM apache/airflow:2.9.0 AS base
 
 COPY ./requirements.txt /requirements.txt
