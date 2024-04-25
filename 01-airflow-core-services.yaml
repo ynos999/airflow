@@ -18,8 +18,7 @@ services:
         constraints:
           - "node.hostname==swarm-master"
     # Uzzināt master node name `docker node ls`, lai dockeris nemaina lokāciju.
-    #       - "node.role==manager" 
-    # Atradīsies tikai uz manager node. Ja vairāki manager, tad nederēs.
+    #       - "node.role==manager" atradīsies tikai uz manager node. Ja vairāki manager, tad nederēs.
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
