@@ -9,11 +9,14 @@ services:
       POSTGRES_DB: airflow
     volumes:
       - postgres:/var/lib/postgresql/data
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - node.hostname == target_node_name
-
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    deploy:
+      placement:
+        constraints:
+          - "node.hostname==swarm-master"
     # Uzzināt master node name `docker node ls`, lai dockeris nemaina lokāciju.
     #       - "node.role==manager" 
     # Atradīsies tikai uz manager node. Ja vairāki manager, tad nederēs.
@@ -28,10 +31,14 @@ services:
 
   redis:
     image: redis:latest
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - node.hostname == target_node_name
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+    deploy:
+      placement:
+        constraints:
+          - "node.hostname==swarm-master"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -46,12 +53,12 @@ services:
 
   registry:
     image: registry:2
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - node.hostname == target_node_name
     ports:
       - 5000:5000
+    deploy:
+      placement:
+        constraints:
+          - "node.hostname==swarm-master"
     volumes:
       - registry:/var/lib/registry
     restart: always

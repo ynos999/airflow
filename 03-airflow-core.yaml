@@ -1,7 +1,7 @@
 ---
 x-airflow-common: &airflow-common
-  # image: registry:5000/fid-airflow:2.9.0-001
-  image: 127.0.0.1:5000/fid-airflow:2.9.0-001
+  image: registry:5000/fid-airflow:2.9.0-001
+  # image: 127.0.0.1:5000/fid-airflow:2.9.0-001
 
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -28,6 +28,10 @@ services:
     command: webserver
     ports:
       - "8080:8080"
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - "node.hostname==swarm-node-01"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -41,6 +45,12 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    # deploy:
+    #   replicas: 2
+    #   placement:
+    #     max_replicas_per_node: 2
+    #     constraints:
+    #       - "node.hostname==swarm-node-01"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -55,9 +65,9 @@ services:
     <<: *airflow-common
     command: celery worker
     deploy:
-      replicas: 2
+      replicas: 3
       placement:
-        max_replicas_per_node: 2
+        max_replicas_per_node: 3
     healthcheck:
       # yamllint disable rule:line-length
       test:
@@ -79,6 +89,10 @@ services:
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - "node.hostname==swarm-node-01"
     healthcheck:
       test:
         [
