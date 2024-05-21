@@ -1,7 +1,7 @@
 ---
 x-airflow-common: &airflow-common
-  image: registry:5000/fid-airflow:2.9.0-001
-  # image: 127.0.0.1:5000/fid-airflow:2.9.0-001
+  # image: registry:5000/fid-airflow:2.9.0-001
+  image: 127.0.0.1:5000/fid-airflow:2.9.0-001
 
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -31,10 +31,12 @@ services:
     command: webserver
     ports:
       - "8080:8080"
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - "node.hostname==swarm-node-01"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+#         - "node.hostname==swarm-node-01"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -47,13 +49,13 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
-    command: scheduler
-    # deploy:
-    #   replicas: 2
-    #   placement:
-    #     max_replicas_per_node: 2
-    #     constraints:
-    #       - "node.hostname==swarm-node-01"
+    command: scheduler  
+    deploy:
+      replicas: 2
+      placement:
+        max_replicas_per_node: 2
+        constraints:
+          - node.role == worker
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -71,6 +73,8 @@ services:
       replicas: 3
       placement:
         max_replicas_per_node: 3
+        constraints:
+          - node.role == worker
     healthcheck:
       # yamllint disable rule:line-length
       test:
@@ -82,8 +86,6 @@ services:
       start_period: 30s
     environment:
       <<: *airflow-common-env
-      # Required to handle warm shutdown of the celery workers properly
-      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
     restart: always
     networks:
@@ -92,10 +94,11 @@ services:
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - "node.hostname==swarm-node-01"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     healthcheck:
       test:
         [
