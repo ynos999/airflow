@@ -29,14 +29,14 @@ docker tag fid-airflow:2.9.0-001 registry:5000/fid-airflow:2.9.0-001
 ```
 docker push registry:5000/fid-airflow:2.9.0-001
 ```
-## Ja lieto registry, tad hosts failā ir jāveic izmaiņas:
+## If you use the registry, you need to make changes to the hosts file:
 ```
 sudo nano /etc/hosts
 ```
 ```
 127.0.0.1 registry
 ```
-## Ja izmanto registry, tad pievieno 02 un 03 failā image name...
+## If using registry, then add 02 and 03 to the image name file...
 ```
 Kad tiks veiktas izmaiņas, tad ir atkārtoti jāveic visas operācijas un ir jānomaina
 tagi, lai nebūtu konfliktu ar citām versijām.
@@ -62,6 +62,8 @@ Ja vēlētos veikt push no āras, tad ir divi veidi, kā to var izdarīt:
 ```
 docker stack deploy -c .\02-airflow-init.yaml airflow-init
 ```
+When airflow-init has finished its work (determined by `docker stack ps airflow-init`), you need to delete the `airflow-init` stack and start the `airflow-core` stack.
+
 Kad airflow-init ir pabeidzis darbu (nosaka ar `docker stack ps airflow-init`), tad ir jāizdzēš stack `airflow-init` un jāpalaiž stack `airflow-core`
 
 ```
