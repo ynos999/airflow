@@ -1,9 +1,9 @@
-## Secība:
-**1. Jāizveido tīkls swarm režīmā, lai tam var piekļūt dažādi stacks**
+## Sequence:
+**1. Create a network in swarm mode so that it can be accessed by different stacks**
 ```
 docker network create --driver overlay --scope swarm airflow
 ```
-**2. Palaiž postgres, redis un private registry**
+**2. Run postgres, redis and private registry**
 ```
 docker stack deploy -c .\01-airflow-core-services.yaml airflow-core-services
 ```
@@ -11,11 +11,12 @@ docker stack deploy -c .\01-airflow-core-services.yaml airflow-core-services
 ```
 docker build -t fid-airflow:2.9.0-001 ./airflow
 ```
-## Pievieno tag (katru reizi jāmaina tag):
+## Add a tag (change the tag each time):
 ```
 docker tag fid-airflow:2.9.0-001 127.0.0.1:5000/fid-airflow:2.9.0-001
 ```
-## Iepušo privātajā reģistrā:
+## Push to private registry:
+
 ```
 docker push 127.0.0.1:5000/fid-airflow:2.9.0-001
 ```
@@ -71,8 +72,8 @@ docker stack rm airflow-init
 ```
 docker stack deploy -c .\03-airflow-core.yaml airflow-core
 ```
-
-# Noderīgas komandas:
+# Useful commands:
+##
 ## Inicializēt docker swarm:
 ```
 docker swarm init
