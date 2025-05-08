@@ -22,7 +22,7 @@ docker tag fid-airflow:2.9.0-001 127.0.0.1:5000/fid-airflow:2.9.0-001
 ```
 docker push 127.0.0.1:5000/fid-airflow:2.9.0-001
 ```
-vai:
+or:
 ```
 docker tag fid-airflow:2.9.0-001 registry:5000/fid-airflow:2.9.0-001
 ```
