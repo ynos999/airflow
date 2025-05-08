@@ -58,7 +58,7 @@ Ja vēlētos veikt push no āras, tad ir divi veidi, kā to var izdarīt:
 2. Uzstādi kādu reverse proxy, kas ļaus piekļūt privātajam reģistram no ārpasaules ar
    noteiktu IP adresi, autorizāciju, utt.
 ```
-**4. Inicializē airflow**
+**4. Initialize airflow**
 ```
 docker stack deploy -c .\02-airflow-init.yaml airflow-init
 ```
@@ -70,7 +70,7 @@ docker stack ps airflow-init
 ```
 docker stack rm airflow-init
 ```
-**5. Palaiž pašu airflow**
+**5. Run your airflow**
 ```
 docker stack deploy -c .\03-airflow-core.yaml airflow-core
 ```
